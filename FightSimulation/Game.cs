@@ -4,6 +4,9 @@ using System.Text;
 
 namespace FightSimulation
 {
+    /// <summary>
+    /// Makes a new type Monster to make it easier to construct monsters later on.
+    /// </summary>
     struct Monster
     {
         public string name;
@@ -17,8 +20,8 @@ namespace FightSimulation
         /// <summary>
         /// Calculates the damage between two monsters by subtracting one's attack from the other's defense.
         /// </summary>
-        /// <param name="fighterAttack"></param>
-        /// <param name="defenderDefense"></param>
+        /// <param name="fighterAttack"> The one who is initiating the fight's attack. </param>
+        /// <param name="defenderDefense"> The target of the attack's defense. </param>
         /// <returns></returns>
         float CalculateDamage(float fighterAttack, float defenderDefense)
         {
@@ -30,6 +33,18 @@ namespace FightSimulation
             }
 
             return damage;
+        }
+
+        float CalculateDamage(Monster attacker, Monster defender)
+        {
+            return attacker.attack - defender.defense;
+        }
+
+        float Fight(ref Monster attacker, ref Monster defender)
+        {
+            float damageTaken = CalculateDamage(attacker, defender);
+            defender.health -= damageTaken;
+            return damageTaken;
         }
 
         /// <summary>
@@ -68,11 +83,9 @@ namespace FightSimulation
             Console.Clear();
 
             Console.WriteLine("The monsters fight!");
-            float damage = CalculateDamage(monster1.attack, monster2.defense);
-            monster2.health -= damage;
+            float damage = Fight(ref monster1, ref monster2);
             Console.WriteLine(monster2.name + " takes " + damage + " damage!");
-            damage = CalculateDamage(monster2.attack, monster1.defense);
-            monster1.health -= damage;
+            damage = Fight(ref monster2, ref monster1);
             Console.WriteLine(monster1.name + " takes " + damage + " damage!");
 
             Console.ReadKey();
