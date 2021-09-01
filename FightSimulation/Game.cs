@@ -17,6 +17,16 @@ namespace FightSimulation
 
     class Game
     {
+        bool gameOver = false;
+        Monster currentMonster1;
+        Monster currentMonster2;
+        int currentMonsterIndex = 1;
+
+        Monster Wompus;
+        Monster Thwompus;
+        Monster WompusWithAGun;
+        Monster UnclePhil;
+
         /// <summary>
         /// Calculates the damage between two monsters by subtracting one's attack from the other's defense.
         /// </summary>
@@ -48,7 +58,7 @@ namespace FightSimulation
         /// <param name="monster1"> The first monster. </param>
         /// <param name="monster2"> The second monster. </param>
         /// <returns> Returns which one is the winner, if neither survives it is a draw. </returns>
-        string DoBattle(ref Monster monster1, ref Monster monster2)
+        string StartBattle(ref Monster monster1, ref Monster monster2)
         {
             string matchResult = "No Contest";
             while(monster1.health > 0 && monster2.health > 0)
@@ -113,41 +123,89 @@ namespace FightSimulation
             Console.Clear();
         }
 
+        void Update()
+        {
+            Battle();
+        }
+
+        Monster GetMonster(int monsterIndex)
+        {
+            Monster monster;
+            monster.name = "None";
+            monster.health = 1;
+            monster.defense = 1;
+            monster.attack = 1;
+
+            if (monsterIndex == 1)
+            {
+                monster = UnclePhil;
+            }
+            else if (monsterIndex == 2)
+            {
+                monster = WompusWithAGun;
+            }
+            else if (monsterIndex == 3)
+            {
+                monster = Wompus;
+            }
+            else if (monsterIndex == 4)
+            {
+                monster = Thwompus;
+            }
+
+            return monster;
+        }
+
+        void Battle()
+        {
+            PrintMonsterStats(currentMonster1);
+
+            PrintMonsterStats(currentMonster2);
+
+            Console.WriteLine("The monsters fight!");
+            float damage = Fight(ref currentMonster1, ref currentMonster2);
+            Console.WriteLine(currentMonster2.name + " takes " + damage + " damage!");
+            damage = Fight(ref currentMonster2, ref currentMonster1);
+            Console.WriteLine(currentMonster1.name + " takes " + damage + " damage!");
+        }
+
+        void UpdateCurrentMonsters()
+        {
+           
+        }
+
         public void Run()
         {
             string winner = "";
 
-            // Initializes stats of Monster 1.
-            Monster Wompus;
+            // Initializes stats of Wompus.
             Wompus.name = "Wompus";
             Wompus.health = 20f;
-            Wompus.attack = 10f;
+            Wompus.attack = 15f;
             Wompus.defense = 5f;
 
-            // Initializes stats of Monster 2.
-            Monster Flompus;
-            Flompus.name = "Flompus";
-            Flompus.health = 15f;
-            Flompus.attack = 15f;
-            Flompus.defense = 10f;
+            // Initializes stats of Thwompus.
+            Thwompus.name = "Thwompus";
+            Thwompus.health = 15f;
+            Thwompus.attack = 15f;
+            Thwompus.defense = 10f;
 
-            Monster WompusWithAGun;
+            // Initializes stats of Wompus With A Gun.
             WompusWithAGun.name = "Wompus With A Gun";
             WompusWithAGun.health = 20f;
             WompusWithAGun.attack = 25f;
             WompusWithAGun.defense = 5f;
 
-            Monster UnclePhil;
+            // Initializes stats of Uncle Phil.
             UnclePhil.name = "Uncle Phil";
             UnclePhil.health = 1f;
             UnclePhil.attack = 25f;
             UnclePhil.defense = 0f;
 
-            winner = DoBattle(ref Wompus, ref Flompus);
-            DeclareWinner(winner);
+            while (!gameOver)
+            {
 
-            winner = DoBattle(ref WompusWithAGun, ref UnclePhil);
-            DeclareWinner(winner);
+            }
         }
     }
 }
