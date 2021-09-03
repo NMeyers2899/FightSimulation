@@ -53,47 +53,6 @@ namespace FightSimulation
         }
 
         /// <summary>
-        /// Pits the monsters against one another, whoever survives is deemed the winner.
-        /// </summary>
-        /// <param name="monster1"> The first monster. </param>
-        /// <param name="monster2"> The second monster. </param>
-        /// <returns> Returns which one is the winner, if neither survives it is a draw. </returns>
-        string StartBattle(ref Monster monster1, ref Monster monster2)
-        {
-            string matchResult = "No Contest";
-            while(monster1.health > 0 && monster2.health > 0)
-            {
-                PrintMonsterStats(monster1);
-
-                PrintMonsterStats(monster2);
-
-                Console.WriteLine("The monsters fight!");
-                float damage = Fight(ref monster1, ref monster2);
-                Console.WriteLine(monster2.name + " takes " + damage + " damage!");
-                damage = Fight(ref monster2, ref monster1);
-                Console.WriteLine(monster1.name + " takes " + damage + " damage!");
-
-                Console.ReadKey(true);
-                Console.Clear();
-            }
-
-            if(monster1.health <= 0 && monster2.health <= 0)
-            {
-                matchResult = "Draw";
-            }
-            else if(monster1.health <= 0)
-            {
-                matchResult = monster2.name;
-            }
-            else if(monster2.health <= 0)
-            {
-                matchResult = monster1.name;
-            }
-
-            return matchResult;
-        }
-
-        /// <summary>
         /// Prints all the stats associated with the monster that is passed through the function.
         /// </summary>
         /// <param name="monster"> The monster whose stats will be displayed. </param>
@@ -123,18 +82,64 @@ namespace FightSimulation
             Console.Clear();
         }
 
+        /// <summary>
+        /// Is called at the beginning of the game to initialize important stats.
+        /// </summary>
+        void Start()
+        {
+            // Initializes stats of Wompus.
+            Wompus.name = "Wompus";
+            Wompus.health = 20;
+            Wompus.attack = 15;
+            Wompus.defense = 5;
+
+            // Initializes stats of Thwompus.
+            Thwompus.name = "Thwompus";
+            Thwompus.health = 15;
+            Thwompus.attack = 15;
+            Thwompus.defense = 10;
+
+            // Initializes stats of Wompus With A Gun.
+            WompusWithAGun.name = "Wompus With A Gun";
+            WompusWithAGun.health = 20;
+            WompusWithAGun.attack = 30;
+            WompusWithAGun.defense = 5;
+
+            // Initializes stats of Uncle Phil.
+            UnclePhil.name = "Uncle Phil";
+            UnclePhil.health = 1;
+            UnclePhil.attack = 25;
+            UnclePhil.defense = 0;
+
+            // Sets starting monsters.
+            currentMonster1 = GetMonster(currentMonsterIndex);
+            currentMonsterIndex++;
+            currentMonster2 = GetMonster(currentMonsterIndex);
+        }
+
+        /// <summary>
+        /// Updates the current game information.
+        /// </summary>
         void Update()
         {
             Battle();
+            UpdateCurrentMonsters();
+            Console.ReadKey(true);
+            Console.Clear();
         }
 
+        /// <summary>
+        /// Sets up the next monster for a fight.
+        /// </summary>
+        /// <param name="monsterIndex"> The identifier for the monster. </param>
+        /// <returns></returns>
         Monster GetMonster(int monsterIndex)
         {
             Monster monster;
             monster.name = "None";
             monster.health = 1;
-            monster.defense = 1;
-            monster.attack = 1;
+            monster.defense = 0;
+            monster.attack = 0;
 
             if (monsterIndex == 1)
             {
@@ -156,55 +161,62 @@ namespace FightSimulation
             return monster;
         }
 
+        /// <summary>
+        /// Simulates one turn in the current monster fight.
+        /// </summary>
         void Battle()
         {
             PrintMonsterStats(currentMonster1);
 
             PrintMonsterStats(currentMonster2);
 
-            Console.WriteLine("The monsters fight!");
+            Console.WriteLine(currentMonster1.name + " and " + currentMonster2.name + " fight!");
+
+            // Monster 1 attacks Monster 2.
             float damage = Fight(ref currentMonster1, ref currentMonster2);
             Console.WriteLine(currentMonster2.name + " takes " + damage + " damage!");
+
+            // Monster 2 attacks Monster 1.
             damage = Fight(ref currentMonster2, ref currentMonster1);
             Console.WriteLine(currentMonster1.name + " takes " + damage + " damage!");
         }
 
+        /// <summary>
+        /// Updates the current monsters if one or more is dead, or ends the game if there are none left.
+        /// </summary>
         void UpdateCurrentMonsters()
         {
-           
+            // Checks to see if monster 1 has died. If it has, it replaces monster 1.
+           if(currentMonster1.health <= 0)
+            {
+                // Increments the current monster index.
+                currentMonsterIndex++;
+                currentMonster1 = GetMonster(currentMonsterIndex);
+            }
+
+            // Checks to see if monster 2 has died. If it has, it replaces monster 2.
+            if (currentMonster2.health <= 0)
+            {
+                // Increments the current monster index.
+                currentMonsterIndex++;
+                currentMonster2 = GetMonster(currentMonsterIndex);
+            }
+
+            // Checks to see if there are any more fighters available. If not, it ends the game.
+            if (currentMonster2.name == "None" || currentMonster1.name == "None" && currentMonsterIndex >= 4)
+            {
+                Console.WriteLine("Simulation Over");
+                gameOver = true;
+            }
         }
 
         public void Run()
         {
-            string winner = "";
-
-            // Initializes stats of Wompus.
-            Wompus.name = "Wompus";
-            Wompus.health = 20f;
-            Wompus.attack = 15f;
-            Wompus.defense = 5f;
-
-            // Initializes stats of Thwompus.
-            Thwompus.name = "Thwompus";
-            Thwompus.health = 15f;
-            Thwompus.attack = 15f;
-            Thwompus.defense = 10f;
-
-            // Initializes stats of Wompus With A Gun.
-            WompusWithAGun.name = "Wompus With A Gun";
-            WompusWithAGun.health = 20f;
-            WompusWithAGun.attack = 25f;
-            WompusWithAGun.defense = 5f;
-
-            // Initializes stats of Uncle Phil.
-            UnclePhil.name = "Uncle Phil";
-            UnclePhil.health = 1f;
-            UnclePhil.attack = 25f;
-            UnclePhil.defense = 0f;
+            Start();
 
             while (!gameOver)
             {
-
+                Update();
             }
         }
     }
