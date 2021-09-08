@@ -20,7 +20,9 @@ namespace FightSimulation
         bool gameOver = false;
         Monster currentMonster1;
         Monster currentMonster2;
-        int currentMonsterIndex = 1;
+
+        int currentMonsterIndex = 0;
+        int currentScene = 0;
 
         Monster Wompus;
         Monster Thwompus;
@@ -50,6 +52,15 @@ namespace FightSimulation
             float damageTaken = CalculateDamage(attacker.attack, defender.defense);
             defender.health -= damageTaken;
             return damageTaken;
+        }
+
+        void ResetCurrentMonsters()
+        {
+            currentMonsterIndex = 0;
+            // Sets starting fighters.
+            currentMonster1 = GetMonster(currentMonsterIndex);
+            currentMonsterIndex++;
+            currentMonster2 = GetMonster(currentMonsterIndex);
         }
 
         /// <summary>
@@ -89,27 +100,27 @@ namespace FightSimulation
         {
             // Initializes stats of Wompus.
             Wompus.name = "Wompus";
-            Wompus.health = 20;
+            Wompus.health = 23.5f;
             Wompus.attack = 15;
             Wompus.defense = 5;
 
             // Initializes stats of Thwompus.
             Thwompus.name = "Thwompus";
-            Thwompus.health = 15;
-            Thwompus.attack = 15;
-            Thwompus.defense = 10;
+            Thwompus.health = 16.7f;
+            Thwompus.attack = 15.7f;
+            Thwompus.defense = 10.3f;
 
             // Initializes stats of Wompus With A Gun.
             WompusWithAGun.name = "Wompus With A Gun";
-            WompusWithAGun.health = 20;
-            WompusWithAGun.attack = 30;
+            WompusWithAGun.health = 23.5f;
+            WompusWithAGun.attack = 25;
             WompusWithAGun.defense = 5;
 
             // Initializes stats of Uncle Phil.
             UnclePhil.name = "Uncle Phil";
-            UnclePhil.health = 1;
-            UnclePhil.attack = 25;
-            UnclePhil.defense = 0;
+            UnclePhil.health = 12.3f;
+            UnclePhil.attack = 20.5f;
+            UnclePhil.defense = 10;
 
             // Sets starting monsters.
             currentMonster1 = GetMonster(currentMonsterIndex);
@@ -122,10 +133,120 @@ namespace FightSimulation
         /// </summary>
         void Update()
         {
-            Battle();
-            UpdateCurrentMonsters();
-            Console.ReadKey(true);
+            UpdateCurrentScene();
             Console.Clear();
+        }
+
+        /// <summary>
+        /// Changes the scene between events.
+        /// </summary>
+        void UpdateCurrentScene()
+        { 
+            switch (currentScene)
+            {
+                case 0:
+                    DisplayStartMenu();
+                    break;
+
+                case 1:
+                    Battle();
+                    UpdateCurrentMonsters();
+                    Console.ReadKey(true);
+                    Console.Clear();
+                    break;
+
+                case 2:
+                    DisplayRestartMenu();
+                    break;
+
+                default:
+                    Console.WriteLine("Invalid Scene Index");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Gets the user's input on a given topic, giving them two options to choose from.
+        /// </summary>
+        /// <param name="description"> The description of the choice. </param>
+        /// <param name="option1"> The first option. </param>
+        /// <param name="option2"> The second option. </param>
+        /// <param name="pauseInvalid"> Pauses the game if the choice was invalid. </param>
+        /// <returns> The number assigned to the made choice if it was valid. </returns>
+        int GetInput(string description, string option1, string option2, bool pauseInvalid = false)
+        {
+            // The choice given to the user.
+            Console.Write(description + "\n1. " + option1 + "\n2. " + option2 + "\n> ");
+
+            // Gets player input.
+            string input = Console.ReadLine().ToLower();
+            int choice = 0;
+
+            if(input == "1")
+            {
+                choice = 1;
+            }
+            else if(input == "2")
+            {
+                choice = 2;
+            }
+            else
+            {
+                Console.WriteLine("Invalid Input");
+
+                if (pauseInvalid)
+                {
+                    Console.ReadKey(true);
+                }
+            }
+
+            // Returns the player's choice.
+            return choice;
+        }
+
+        /// <summary>
+        /// Asks the user whether or not they wish to start the game or end the simulation. Giving them the
+        /// choice to do either.
+        /// </summary>
+        void DisplayStartMenu()
+        {
+            // Gets the users input.
+            int choice = GetInput(" Welcome to Monster Fight Simulator!", "Start Simulation", 
+                "Quit Application");
+
+            // Starts the battle scene.
+            if (choice == 1)
+            {
+                currentScene = 1;
+                Console.Clear();
+            }
+            // Quits the game.
+            else if(choice == 2)
+            {
+                gameOver = true;
+            }
+        }
+
+        /// <summary>
+        /// Asks the user if they wish to restart the simulation.
+        /// </summary>
+        void DisplayRestartMenu()
+        {
+            // Gets the users input.
+            int choice = GetInput("Would you like to restart the simulation?", "Restart", "Quit");
+
+            // Resets to the start menu.
+            if (choice == 1)
+            {
+                ResetCurrentMonsters();
+                currentScene = 0;
+                Console.Clear();
+            }
+            // Quits the game.
+            else if (choice == 2)
+            {
+                gameOver = true;
+            }
         }
 
         /// <summary>
@@ -141,19 +262,19 @@ namespace FightSimulation
             monster.defense = 0;
             monster.attack = 0;
 
-            if (monsterIndex == 1)
+            if (monsterIndex == 0)
             {
                 monster = UnclePhil;
             }
-            else if (monsterIndex == 2)
+            else if (monsterIndex == 1)
             {
                 monster = WompusWithAGun;
             }
-            else if (monsterIndex == 3)
+            else if (monsterIndex == 2)
             {
                 monster = Wompus;
             }
-            else if (monsterIndex == 4)
+            else if (monsterIndex == 3)
             {
                 monster = Thwompus;
             }
@@ -202,11 +323,10 @@ namespace FightSimulation
                 currentMonster2 = GetMonster(currentMonsterIndex);
             }
 
-            // Checks to see if there are any more fighters available. If not, it ends the game.
-            if (currentMonster2.name == "None" || currentMonster1.name == "None" && currentMonsterIndex >= 4)
+            // Checks to see if there are any more fighters available. If not, it goes to the restart menu.
+            if (currentMonster2.name == "None" || currentMonster1.name == "None" && currentMonsterIndex >= 3)
             {
-                Console.WriteLine("Simulation Over");
-                gameOver = true;
+                currentScene = 2;
             }
         }
 
