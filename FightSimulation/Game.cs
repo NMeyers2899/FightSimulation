@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace FightSimulation
-{
+{ 
     /// <summary>
     /// Makes a new type Monster to make it easier to construct monsters later on.
     /// </summary>
@@ -28,13 +28,18 @@ namespace FightSimulation
         Monster Thwompus;
         Monster WompusWithAGun;
         Monster UnclePhil;
+        Monster Warpus;
+        Monster GigaWarpus;
+        Monster DoctorPhil;
+        Monster UltraPhil;
+        Monster Wimpus;
 
         /// <summary>
         /// Calculates the damage between two monsters by subtracting one's attack from the other's defense.
         /// </summary>
         /// <param name="fighterAttack"> The one who is initiating the fight's attack. </param>
         /// <param name="defenderDefense"> The target of the attack's defense. </param>
-        /// <returns></returns>
+        /// <returns> The damage that is dealt. </returns>
         float CalculateDamage(float fighterAttack, float defenderDefense)
         {
             // Checks if damage is less than or equal to zero, if it isn't it just sets the damage to zero.
@@ -47,6 +52,12 @@ namespace FightSimulation
             return damage;
         }
 
+        /// <summary>
+        /// Pits two monsters against each other and deals damage to the defender.
+        /// </summary>
+        /// <param name="attacker"> The aggressor who deals damage. </param>
+        /// <param name="defender"> The target, who damage is dealt to. </param>
+        /// <returns> Returns the damage taken by the defender. </returns>
         float Fight(ref Monster attacker, ref Monster defender)
         {
             float damageTaken = CalculateDamage(attacker.attack, defender.defense);
@@ -106,7 +117,7 @@ namespace FightSimulation
 
             // Initializes stats of Thwompus.
             Thwompus.name = "Thwompus";
-            Thwompus.health = 16.7f;
+            Thwompus.health = 16;
             Thwompus.attack = 15.7f;
             Thwompus.defense = 10.3f;
 
@@ -119,7 +130,7 @@ namespace FightSimulation
             // Initializes stats of Uncle Phil.
             UnclePhil.name = "Uncle Phil";
             UnclePhil.health = 12.3f;
-            UnclePhil.attack = 20.5f;
+            UnclePhil.attack = 25.4f;
             UnclePhil.defense = 10;
 
             // Sets starting monsters.
@@ -135,6 +146,14 @@ namespace FightSimulation
         {
             UpdateCurrentScene();
             Console.Clear();
+        }
+
+        /// <summary>
+        /// Gives a farewell message to the player.
+        /// </summary>
+        void End()
+        {
+            Console.WriteLine("Goodbye!");
         }
 
         /// <summary>
@@ -253,7 +272,7 @@ namespace FightSimulation
         /// Sets up the next monster for a fight.
         /// </summary>
         /// <param name="monsterIndex"> The identifier for the monster. </param>
-        /// <returns></returns>
+        /// <returns> Returns the monster that will be a new fighter. </returns>
         Monster GetMonster(int monsterIndex)
         {
             Monster monster;
@@ -303,7 +322,8 @@ namespace FightSimulation
         }
 
         /// <summary>
-        /// Updates the current monsters if one or more is dead, or ends the game if there are none left.
+        /// Updates the current monsters if one or more is dead, or sends the user to the reset menu if there
+        /// are none left.
         /// </summary>
         void UpdateCurrentMonsters()
         {
@@ -330,14 +350,63 @@ namespace FightSimulation
             }
         }
 
+        void PrintList()
+        {
+            int[] array = new int[5];
+            int num = 0;
+            bool validInputRecieved = false;
+            for(int i = 0; i < 5; i++)
+            {
+                Console.WriteLine("Please enter five numbers. No decimals.");
+                while (!validInputRecieved)
+                {
+                    string choice = Console.ReadLine();
+                    if (int.TryParse(choice, out num))
+                    {
+                        int.TryParse(choice, out num);
+                        validInputRecieved = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Input");
+                    }
+                }
+                array[i] = num;
+                validInputRecieved = false;
+            }
+
+            int largest = array[1];
+            int smallest = array[1];
+
+            for(int i = 0; i < array.Length; i++)
+            {
+                if(array[i] < smallest)
+                {
+                    smallest = array[i];
+                }
+                else if(array[i] > largest)
+                {
+                    largest = array[i];
+                }
+
+            }
+
+            Console.WriteLine("The largest number was " + largest + ". \nAnd the smallest number was " 
+                + smallest);
+        }
+
         public void Run()
         {
-            Start();
+            PrintList();
 
-            while (!gameOver)
-            {
-                Update();
-            }
+            //Start();
+
+            //while (!gameOver)
+            //{
+              //  Update();
+            //}
+
+            //End();
         }
     }
 }
