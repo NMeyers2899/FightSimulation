@@ -34,6 +34,8 @@ namespace FightSimulation
         Monster UltraPhil;
         Monster Wimpus;
 
+        Monster[] monsterList;
+
         /// <summary>
         /// Calculates the damage between two monsters by subtracting one's attack from the other's defense.
         /// </summary>
@@ -69,9 +71,9 @@ namespace FightSimulation
         {
             currentMonsterIndex = 0;
             // Sets starting fighters.
-            currentMonster1 = GetMonster(currentMonsterIndex);
+            currentMonster1 = monsterList[currentMonsterIndex];
             currentMonsterIndex++;
-            currentMonster2 = GetMonster(currentMonsterIndex);
+            currentMonster2 = monsterList[currentMonsterIndex];
         }
 
         /// <summary>
@@ -111,32 +113,34 @@ namespace FightSimulation
         {
             // Initializes stats of Wompus.
             Wompus.name = "Wompus";
-            Wompus.health = 23.5f;
+            Wompus.health = 23;
             Wompus.attack = 15;
             Wompus.defense = 5;
 
             // Initializes stats of Thwompus.
             Thwompus.name = "Thwompus";
             Thwompus.health = 16;
-            Thwompus.attack = 15.7f;
-            Thwompus.defense = 10.3f;
+            Thwompus.attack = 15;
+            Thwompus.defense = 10;
 
             // Initializes stats of Wompus With A Gun.
             WompusWithAGun.name = "Wompus With A Gun";
-            WompusWithAGun.health = 23.5f;
+            WompusWithAGun.health = 23;
             WompusWithAGun.attack = 25;
             WompusWithAGun.defense = 5;
 
             // Initializes stats of Uncle Phil.
             UnclePhil.name = "Uncle Phil";
-            UnclePhil.health = 12.3f;
-            UnclePhil.attack = 25.4f;
+            UnclePhil.health = 12;
+            UnclePhil.attack = 25;
             UnclePhil.defense = 10;
 
+            monsterList = new Monster[] { Wompus, Thwompus, WompusWithAGun, UnclePhil };
+
             // Sets starting monsters.
-            currentMonster1 = GetMonster(currentMonsterIndex);
+            currentMonster1 = monsterList[currentMonsterIndex];
             currentMonsterIndex++;
-            currentMonster2 = GetMonster(currentMonsterIndex);
+            currentMonster2 = monsterList[currentMonsterIndex];
         }
 
         /// <summary>
@@ -268,37 +272,16 @@ namespace FightSimulation
             }
         }
 
-        /// <summary>
-        /// Sets up the next monster for a fight.
-        /// </summary>
-        /// <param name="monsterIndex"> The identifier for the monster. </param>
-        /// <returns> Returns the monster that will be a new fighter. </returns>
-        Monster GetMonster(int monsterIndex)
+        bool TryEndSimulation()
         {
-            Monster monster;
-            monster.name = "None";
-            monster.health = 1;
-            monster.defense = 0;
-            monster.attack = 0;
+            bool simulationOver = currentMonsterIndex >= monsterList.Length;
 
-            if (monsterIndex == 0)
+            if (simulationOver)
             {
-                monster = UnclePhil;
-            }
-            else if (monsterIndex == 1)
-            {
-                monster = WompusWithAGun;
-            }
-            else if (monsterIndex == 2)
-            {
-                monster = Wompus;
-            }
-            else if (monsterIndex == 3)
-            {
-                monster = Thwompus;
+                currentScene = 2;
             }
 
-            return monster;
+            return simulationOver;
         }
 
         /// <summary>
@@ -327,86 +310,52 @@ namespace FightSimulation
         /// </summary>
         void UpdateCurrentMonsters()
         {
-            // Checks to see if monster 1 has died. If it has, it replaces monster 1.
-           if(currentMonster1.health <= 0)
+            // Checks to see if there are any more fighters available. If not, it goes to the restart menu.
+            if (currentMonsterIndex >= monsterList.Length)
             {
-                // Increments the current monster index.
-                currentMonsterIndex++;
-                currentMonster1 = GetMonster(currentMonsterIndex);
+                currentScene = 2;
             }
 
-            // Checks to see if monster 2 has died. If it has, it replaces monster 2.
+            // Checks to see if monster 1 has died. If it has, it replaces monster 1.
+            if (currentMonster1.health <= 0)
+            {
+                
+                // Increments the current monster index.
+                currentMonsterIndex++;
+
+                if (TryEndSimulation())
+                {
+                    return;
+                }
+
+                currentMonster1 = monsterList[currentMonsterIndex];
+            }
+
+            // Checks to see if monster 1 has died. If it has, it replaces monster 1.
             if (currentMonster2.health <= 0)
             {
                 // Increments the current monster index.
                 currentMonsterIndex++;
-                currentMonster2 = GetMonster(currentMonsterIndex);
-            }
 
-            // Checks to see if there are any more fighters available. If not, it goes to the restart menu.
-            if (currentMonster2.name == "None" || currentMonster1.name == "None" && currentMonsterIndex >= 3)
-            {
-                currentScene = 2;
-            }
-        }
-
-        void PrintList()
-        {
-            int[] array = new int[5];
-            int num = 0;
-            bool validInputRecieved = false;
-            for(int i = 0; i < 5; i++)
-            {
-                Console.WriteLine("Please enter five numbers. No decimals.");
-                while (!validInputRecieved)
+                if (TryEndSimulation())
                 {
-                    string choice = Console.ReadLine();
-                    if (int.TryParse(choice, out num))
-                    {
-                        int.TryParse(choice, out num);
-                        validInputRecieved = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid Input");
-                    }
-                }
-                array[i] = num;
-                validInputRecieved = false;
-            }
-
-            int largest = array[1];
-            int smallest = array[1];
-
-            for(int i = 0; i < array.Length; i++)
-            {
-                if(array[i] < smallest)
-                {
-                    smallest = array[i];
-                }
-                else if(array[i] > largest)
-                {
-                    largest = array[i];
+                    return;
                 }
 
+                currentMonster2 = monsterList[currentMonsterIndex];
             }
-
-            Console.WriteLine("The largest number was " + largest + ". \nAnd the smallest number was " 
-                + smallest);
         }
 
         public void Run()
         {
-            PrintList();
+            Start();
 
-            //Start();
+            while (!gameOver)
+            {
+                Update();
+            }
 
-            //while (!gameOver)
-            //{
-              //  Update();
-            //}
-
-            //End();
+            End();
         }
     }
 }
